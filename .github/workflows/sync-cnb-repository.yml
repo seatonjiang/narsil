@@ -1,0 +1,23 @@
+name: "同步代码仓库"
+
+on: push
+
+jobs:
+  sync-cnb-repository:
+    name: "同步代码仓库"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "拉取代码"
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: "同步代码仓库"
+        uses: docker://tencentcom/git-sync
+        env:
+          PLUGIN_TARGET_URL: "https://cnb.cool/seatonjiang/narsil.git"
+          PLUGIN_AUTH_TYPE: "https"
+          PLUGIN_USERNAME: "cnb"
+          PLUGIN_PASSWORD: ${{ secrets.CNB_TOKEN }}
+          PLUGIN_FORCE: "true"
