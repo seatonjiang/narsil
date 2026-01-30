@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Narsil - Ubuntu 系统安全加固工具
+# Seaton Jiang <hi@seatonjiang.com>
+#
+
+export LC_ALL=C.UTF-8
+
+set -u -o pipefail
+
+G="\033[01;32m"
+N="\033[0m"
+
+echo -e "\n您已登录到 ${G}$(uname -n)${N} 服务器，截至 $(/bin/date "+%Y-%m-%d %H:%M:%S") 的系统状态：\n"

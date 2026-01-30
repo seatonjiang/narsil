@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#
+# Narsil - Ubuntu 系统安全加固工具
+# Seaton Jiang <hi@seatonjiang.com>
+#
+
+export LC_ALL=C.UTF-8
+
+set -u -o pipefail
+
+mapfile -t DFH < <(df -h -x zfs -x squashfs -x tmpfs -x devtmpfs -x overlay --output=target,pcent,size,used,fstype | tail -n+2)
+
+# 进度条总宽度
+BAR_TOTAL=62
+
+G="\033[01;32m"
+Y="\033[01;33m"
+R="\033[01;31m"
+D="\033[39m\033[2m"
+N="\033[0m"
+
+echo -e "  [磁盘用量]\n"
+
+for LINE in "${DFH[@]}"; do
+    # 解析字段：挂载点、使用百分比、总容量、已用、可用、文件系统类型
+    read -r TARGET PCENT SIZE USED FSTYPE <<< "${LINE}"
+    DISK_USAGE=${PCENT%\%}
+    (( USAGE_WIDTH = DISK_USAGE * BAR_TOTAL / 100 ))
+
+    # 分级颜色：<80% 绿色；80–90% 黄色；>90% 红色
+    if (( DISK_USAGE >= 90 )); then
+        COLOR="${R}"
+    elif (( DISK_USAGE >= 80 )); then
+        COLOR="${Y}"
+    else
+        COLOR="${G}"
+    fi
+
+    # 绘制条形图
+    BAR="[${COLOR}"
+    for ((i=0; i<USAGE_WIDTH; i++)); do
+        BAR+="="
+    done
+    BAR+=${D}
+    for ((i=USAGE_WIDTH; i<BAR_TOTAL; i++)); do
+        BAR+="="
+    done
+    BAR+="${N}]"
+
+    printf "  挂载点：%-24s [%s] %s / %s （%s 已使用）\n" "${TARGET}" "${FSTYPE}" "${USED}" "${SIZE}" "${PCENT}"
+    printf "  %b\n" "${BAR}"
+done
+echo

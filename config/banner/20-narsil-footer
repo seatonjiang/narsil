@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Narsil - Ubuntu 系统安全加固工具
+# Seaton Jiang <hi@seatonjiang.com>
+#
+
+export LC_ALL=C.UTF-8
+
+set -u -o pipefail
+
+R="\033[01;31m"
+N="\033[0m"
+
+echo -e "此服务器用于${R}生产环境${N}，未经授权禁止操作，所有变更需经审批并记录。\n"

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+#
+# Narsil - Ubuntu 系统安全加固工具
+# Seaton Jiang <hi@seatonjiang.com>
+#
+
+export LC_ALL=C.UTF-8
+
+set -u -o pipefail
+
+G="\033[01;32m"
+N="\033[0m"
+
+# 获取负载平均值
+read -r LOAD1 LOAD5 LOAD15 <<< "$(awk '{print $1, $2, $3}' /proc/loadavg)"
+
+# 获取物理内存与虚拟内存信息
+read -r MEMORY_USED MEMORY_ALL SWAP_TOTAL SWAP_USED MEMORY_PERCENTAGE <<< "$(awk '
+    /MemTotal:/ {mt=$2}
+    /MemAvailable:/ {ma=$2}
+    /SwapTotal:/ {st=$2}
+    /SwapFree:/ {sf=$2}
+    END {
+        mu=(mt-ma)/1024; ta=mt/1024;
+        su=(st-sf)/1024; tt=st/1024;
+        if (tt<0) tt=0;
+        mp = (ta>0) ? (mu/ta*100) : 0;
+        printf("%.0f %.0f %.0f %.0f %.2f%%", mu, ta, tt, su, mp)
+    }
+' /proc/meminfo)"
+
+# 获取系统运行时间
+UPTIME=$(awk -F. '{print $1}' /proc/uptime)
+UPTIME_DAYS=$(("${UPTIME}"/60/60/24))
+UPTIME_HOURS=$(("${UPTIME}"/60/60%24))
+UPTIME_MINS=$(("${UPTIME}"/60%60))
+UPTIME_SECS=$(("${UPTIME}"%60))
+
+# 获取主机与架构信息
+CPU_MODEL=$(awk -F: '/^model name/{gsub(/^[ \t]+/,"",$2); print $2; exit}' /proc/cpuinfo)
+PROCESSOR_COUNT=$(grep -ioP 'processor\t:' /proc/cpuinfo | wc -l)
+VIRT_TYPE=$(systemd-detect-virt 2>/dev/null || echo "")
+[[ -z "${VIRT_TYPE}" || "${VIRT_TYPE}" == "none" ]] && VIRT_TYPE="Bare Metal"
+if [[ "${VIRT_TYPE}" == "Bare Metal" ]]; then
+    VIRT_LABEL="Bare Metal"
+else
+    VIRT_LABEL=$(echo "${VIRT_TYPE}" | tr '[:lower:]' '[:upper:]')
+fi
+
+# 获取资源与运行态信息
+if (( SWAP_TOTAL > 0 )); then
+    SWAP_PERCENT=$(awk "BEGIN { printf(\"%.2f%%\", ${SWAP_USED}/${SWAP_TOTAL}*100) }")
+    SWAP_LABEL="${SWAP_USED} MB / ${SWAP_TOTAL} MB (${G}${SWAP_PERCENT}${N} 已用)"
+fi
+
+echo -e "  [系统信息]\n"
+echo -e "  系统版本：$(awk -F'[="]+' '/DESCRIPTION/{print $2}' /etc/lsb-release)"
+echo -e "  内核版本：$(uname -sr)"
+echo -e "  主机架构：${CPU_MODEL}（${G}${PROCESSOR_COUNT}${N} vCPU）/ ${VIRT_LABEL}\n"
+echo -e "  运行时间：${G}${UPTIME_DAYS}${N} 天 ${G}${UPTIME_HOURS}${N} 小时 ${G}${UPTIME_MINS}${N} 分钟 ${G}${UPTIME_SECS}${N} 秒"
+echo -e "  物理内存：${MEMORY_USED} MB / ${MEMORY_ALL} MB (${G}${MEMORY_PERCENTAGE}${N} 已用)"
+if (( SWAP_TOTAL > 0 )); then
+echo -e "  虚拟内存：${SWAP_LABEL}"
+fi
+echo -e "  平均负载：${G}${LOAD1}${N} (1分钟), ${G}${LOAD5}${N} (5分钟), ${G}${LOAD15}${N} (15分钟)\n"

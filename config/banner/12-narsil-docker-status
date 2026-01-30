@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+#
+# Narsil - Ubuntu 系统安全加固工具
+# Seaton Jiang <hi@seatonjiang.com>
+#
+
+export LC_ALL=C.UTF-8
+
+set -u -o pipefail
+
+G="\033[01;32m"
+R="\033[01;31m"
+N="\033[0m"
+
+if netstat -anp | grep docker >/dev/null 2>&1; then
+    mapfile -t containers < <(docker ps --format '{{.Names}}\t{{.Status}}' | sort -k1 | awk '{ print $1,$2 }')
+
+    OUTPUT=""
+    for i in "${!containers[@]}"; do
+        IFS=" " read -r NAME STATUS <<< "${containers[i]}"
+
+        # 服务运行中显示绿色，否则显示红色
+        if [[ "${STATUS}" == "Up" ]]; then
+            OUTPUT+="${NAME}:,${G}${STATUS,,}${N},"
+        else
+            OUTPUT+="${NAME}:,${R}${STATUS,,}${N},"
+        fi
+
+        if [ $((("$i"+1) % 4)) -eq 0 ]; then
+            OUTPUT+="\n"
+        fi
+    done
+    OUTPUT+="\n"
+
+    echo -e "  [容器状态]\n"
+    echo -ne "${OUTPUT}" | column -ts $',' | sed -e 's/^/  /'
+    echo
+fi
