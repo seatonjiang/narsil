@@ -1,0 +1,97 @@
+#
+# Narsil - Ubuntu 系统安全加固工具
+# Seaton Jiang <hi@seatonjiang.com>
+#
+
+# 指定 SSH 服务监听的端口
+#Port 22
+
+# 监听所有 IPv4 地址（取消注释可限定监听地址）
+#ListenAddress 0.0.0.0
+
+# 监听所有 IPv6 地址（取消注释可限定监听地址）
+#ListenAddress ::
+
+# 允许 IPv4/IPv6 登录
+AddressFamily any
+
+# 禁止 root 用户直接通过 SSH 登录
+PermitRootLogin no
+
+# 禁用登录时显示 MOTD
+PrintMotd no
+
+# 仅允许公钥认证（取消注释则强制公钥登录）
+#AuthenticationMethods publickey
+
+# 禁止密码认证（取消注释则关闭密码登录）
+#PasswordAuthentication no
+
+# 仅允许指定用户登录（取消注释生效）
+#AllowUsers ubuntu
+
+# 仅允许指定用户组登录（取消注释生效）
+#AllowGroups ubuntu
+
+# 日志级别设为 VERBOSE，记录详细连接与认证信息
+LogLevel VERBOSE
+
+# 允许客户端传递本地化环境变量
+AcceptEnv LANG LC_*
+
+# 最大认证尝试次数为 3 次
+MaxAuthTries 3
+
+# 登录宽限时间为 20 秒
+LoginGraceTime 20
+
+# 禁用挑战响应认证
+ChallengeResponseAuthentication no
+
+# 禁用 Kerberos 认证
+KerberosAuthentication no
+
+# 禁用 GSSAPI 认证
+GSSAPIAuthentication no
+
+# 启用 PAM 认证，使密码认证可用
+UsePAM yes
+
+# 使用内置 SFTP 服务，替代外部 sftp-server
+Subsystem sftp internal-sftp
+
+# 禁用 X11 图形转发
+X11Forwarding no
+
+# 关闭反向 DNS 解析，加快连接速度
+UseDNS no
+
+# 禁止空密码登录
+PermitEmptyPasswords no
+
+# 禁用 SSH 代理转发
+AllowAgentForwarding no
+
+# 禁用 TCP 端口转发
+AllowTcpForwarding no
+
+# 禁用系统级 TCP 保活，由 SSH 层自行处理
+TCPKeepAlive no
+
+# 单个 TCP 连接最多允许 3 个会话（含初始）
+MaxSessions 3
+
+# 空闲 180 秒后向客户端发送保活消息
+ClientAliveInterval 180
+
+# 客户端连续 3 次无响应则断开连接
+ClientAliveCountMax 3
+
+# 禁止 Unix 域套接字转发
+AllowStreamLocalForwarding no
+
+# 强制使用 SSH 协议版本 2
+Protocol 2
+
+# 引入 /etc/ssh/sshd_config.d/ 目录下所有 .conf 配置文件
+Include /etc/ssh/sshd_config.d/*.conf
