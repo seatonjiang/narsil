@@ -83,9 +83,10 @@ function msg_info()
         printf '%s' "${MSG}" >&5
     fi
     if [[ -e /dev/fd/3 ]]; then
-        printf '%s%s%s' "${COLOR_INFO}" "${MSG}" "${COLOR_RESET}" >&3
+        printf '%s%s%s' "${COLOR_INFO}" "${MSG}" "${COLOR_RESET}" >&3 2>/dev/null \
+            || printf '%s%s%s' "${COLOR_INFO}" "${MSG}" "${COLOR_RESET}" 2>/dev/null
     else
-        printf '%s%s%s' "${COLOR_INFO}" "${MSG}" "${COLOR_RESET}"
+        printf '%s%s%s' "${COLOR_INFO}" "${MSG}" "${COLOR_RESET}" 2>/dev/null
     fi
 }
 
@@ -97,9 +98,10 @@ function msg_notic()
         printf '%s' "${MSG}" >&5
     fi
     if [[ -e /dev/fd/3 ]]; then
-        printf '%s%s%s' "${COLOR_NOTICE}" "${MSG}" "${COLOR_RESET}" >&3
+        printf '%s%s%s' "${COLOR_NOTICE}" "${MSG}" "${COLOR_RESET}" >&3 2>/dev/null \
+            || printf '%s%s%s' "${COLOR_NOTICE}" "${MSG}" "${COLOR_RESET}" 2>/dev/null
     else
-        printf '%s%s%s' "${COLOR_NOTICE}" "${MSG}" "${COLOR_RESET}"
+        printf '%s%s%s' "${COLOR_NOTICE}" "${MSG}" "${COLOR_RESET}" 2>/dev/null
     fi
 }
 
@@ -111,9 +113,10 @@ function msg_succ()
         printf '%s' "${MSG}" >&5
     fi
     if [[ -e /dev/fd/3 ]]; then
-        printf '%s%s%s' "${COLOR_SUCCESS}" "${MSG}" "${COLOR_RESET}" >&3
+        printf '%s%s%s' "${COLOR_SUCCESS}" "${MSG}" "${COLOR_RESET}" >&3 2>/dev/null \
+            || printf '%s%s%s' "${COLOR_SUCCESS}" "${MSG}" "${COLOR_RESET}" 2>/dev/null
     else
-        printf '%s%s%s' "${COLOR_SUCCESS}" "${MSG}" "${COLOR_RESET}"
+        printf '%s%s%s' "${COLOR_SUCCESS}" "${MSG}" "${COLOR_RESET}" 2>/dev/null
     fi
 }
 
@@ -125,9 +128,10 @@ function msg_error()
         printf '%s' "${MSG}" >&5
     fi
     if [[ -e /dev/fd/4 ]]; then
-        printf '%s%s%s' "${COLOR_ERROR}" "${MSG}" "${COLOR_RESET}" >&4
+        printf '%s%s%s' "${COLOR_ERROR}" "${MSG}" "${COLOR_RESET}" >&4 2>/dev/null \
+            || printf '%s%s%s' "${COLOR_ERROR}" "${MSG}" "${COLOR_RESET}" >&2 2>/dev/null
     else
-        printf '%s%s%s' "${COLOR_ERROR}" "${MSG}" "${COLOR_RESET}" >&2
+        printf '%s%s%s' "${COLOR_ERROR}" "${MSG}" "${COLOR_RESET}" >&2 2>/dev/null
     fi
 }
 
